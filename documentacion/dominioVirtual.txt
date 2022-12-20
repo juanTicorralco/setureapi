@@ -1,0 +1,16 @@
+crear el dominio virtual
+ 
+1.- ir a C:\xampp\apache\conf\extra\httpd-vhosts.conf y crear el dominio del local host y del vitual 
+<VirtualHost *:80>
+    DocumentRoot "C:/xampp/htdocs/"
+    ServerName localhost
+</VirtualHost>
+
+<VirtualHost *:80>
+    DocumentRoot "C:/xampp/htdocs/setureApi"
+    ServerName setureApi.com
+</VirtualHost>
+
+2.- ir a C:\Windows\System32\drivers\etc\hosts y agregar el nuevo doninio virtual
+
+3.- Reiniciar el xampp

@@ -1,0 +1,8 @@
+1.- Conectar el controlador al index: el archivo routeController conecta el index con el route. el index intancia la funcion index la cual redirige a la carpeta route y el archivo route.php
+2.- Crear el archivo htacces
+3.- crear la primera ruta sin parametros con status 404
+4.- colocar los cors en el index 
+5.- hacer la conexion a la base de datos
+6.- se crean las coneccionex get, post, put, deleteData
+    1.- comenzamos con la get sin filtro: 
+        se crea en el archivo route.php y se complementa con -> controlador -> modelo 
