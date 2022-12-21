@@ -194,13 +194,40 @@ if (count($routesArray) == 0) {
             include_once "ordenable.php";
 
             if (explode("?", $routesArray[1])[0] == "relations" && isset($_GET["rel"]) && isset($_GET["type"])) {
+                $rel = RouetesController::validacionCampos($_GET["rel"], "campo");
+                $type = RouetesController::validacionCampos($_GET["type"], "campo");
+                $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+                $linkTo =  RouetesController::validacionCampos( $_GET["linkTo"], "campo");
+                $filterTo =  RouetesController::validacionCampos( $_GET["filterTo"], "campo");
+                $inTo = RouetesController::validacionCampos(  $_GET["inTo"], "global");
+                $between1 = RouetesController::validacionCampos(  $_GET["between1"], "global");
+                $between2 = RouetesController::validacionCampos(  $_GET["between2"], "global");
+               
+                if($rel == "invalidate" || $type == "invalidate" || $selected == "invalidate"|| $linkTo == "invalidate" || $between1 == "invalidate" || $between2 == "invalidate" || $filterTo == "invalidate" || $inTo == "invalidate"){
+                    $statusCode = new RouetesController();
+                    $statusCode -> StatusResponse("badResponse");
+                    return;
+                }
 
                 $response = new GetController();
-                $response->getBetweenRelData($_GET["rel"], $_GET["type"], $_GET["linkTo"], $_GET['between1'], $_GET['between2'], $_GET['filterTo'], $_GET['inTo'], $orderBy, $orderMode, $startAt, $endAt, $_GET["select"]);
+                $response->getBetweenRelData($rel, $type, $linkTo, $between1, $between2, $filterTo, $inTo, $orderBy, $orderMode, $startAt, $endAt, $selected);
             } else {
+                $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
+                $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+                $linkTo =  RouetesController::validacionCampos( $_GET["linkTo"], "campo");
+                $filterTo =  RouetesController::validacionCampos( $_GET["filterTo"], "campo");
+                $inTo = RouetesController::validacionCampos(  $_GET["inTo"], "global");
+                $between1 = RouetesController::validacionCampos(  $_GET["between1"], "global");
+                $between2 = RouetesController::validacionCampos(  $_GET["between2"], "global");
+               
+                if($tabla == "invalidate" || $selected == "invalidate"|| $linkTo == "invalidate" || $between1 == "invalidate" || $between2 == "invalidate" || $filterTo == "invalidate" || $inTo == "invalidate"){
+                    $statusCode = new RouetesController();
+                    $statusCode -> StatusResponse("badResponse");
+                    return;
+                }
 
                 $response = new GetController();
-                $response->getBetweenData(explode("?", $routesArray[1])[0], $_GET["linkTo"], $_GET['between1'], $_GET['between2'], $_GET['filterTo'], $_GET['inTo'], $orderBy, $orderMode, $startAt, $endAt, $_GET["select"]);
+                $response->getBetweenData($tabla, $linkTo, $between1, $between2, $filterTo, $inTo, $orderBy, $orderMode, $startAt, $endAt, $selected);
             }
         } else {
 
