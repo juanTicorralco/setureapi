@@ -25,28 +25,19 @@ if (count($routesArray) == 0) {
                             if(!empty($user)){
                                 $time = time();
                                 if($user[0]->token_exp_user < $time){
-                                    $json = array(
-                                        'status' => 303,
-                                        'result' => "Error: the token has expired"
-                                    );
-                                    echo json_encode($json, http_response_code($json['status']));
+                                    $statusCode = new RouetesController();
+                                    $statusCode -> StatusResponse("tokenExpire");
                                     return;
                                 }
                             }else{
-                                $json = array(
-                                    'status' => 400,
-                                    "result" => "Error: this user no autorized"
-                                );
-                                echo json_encode($json, http_response_code($json["status"]));
+                                $statusCode = new RouetesController();
+                                $statusCode -> StatusResponse("tokenNoAutorize");
                                 return;   
                             }
                         }
                     }else{
-                        $json = array(
-                            'status' => 400,
-                            "result" => "You need login"
-                        );
-                        echo json_encode($json, http_response_code($json["status"]));
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("tokenNeedLogin");
                         return;
                     }
                 }
@@ -60,79 +51,62 @@ if (count($routesArray) == 0) {
              foreach(RouetesController::tableProtected() as $key => $value){
                 if(explode("?", $routesArray[1])[0] == $value){
                     if(isset($_GET["select"]) && $_GET["select"] == "*"){
-                        $json = array(
-                            'status' => 400,
-                            "result" => "you are no autorized for make this request"
-                        );
-                        echo json_encode($json, http_response_code($json["status"]));
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("badResponse");
                         return;
                     }
                 }
             }
 
             /* GET Order Tables  */
-            if (isset($_GET["orderBy"]) && isset($_GET["orderMode"])) {
-                $orderBy = $_GET["orderBy"];
-                $orderMode = $_GET["orderMode"];
-            } else {
-                $orderBy = null;
-                $orderMode = null;
+            include_once "ordenable.php";
+            $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
+            $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+            $linkTo =  RouetesController::validacionCampos( $_GET["linkTo"], "campo");
+            $equalTo = RouetesController::validacionCampos(  $_GET["equalTo"], "global");
+           
+            if($tabla == "invalidate" || $selected == "invalidate" || $linkTo == "invalidate" || $equalTo == "invalidate"){
+                $statusCode = new RouetesController();
+                $statusCode -> StatusResponse("badResponse");
+                return;
             }
-            /* GET star and end at  */
-            if (isset($_GET["startAt"]) && isset($_GET["endAt"])) {
-                $startAt = $_GET["startAt"];
-                $endAt = $_GET["endAt"];
-            } else {
-                $startAt = null;
-                $endAt = null;
-            }
+
             $response = new GetController();
-            $response->getFilterData(explode("?", $routesArray[1])[0], $_GET["linkTo"], $_GET["equalTo"], $orderBy, $orderMode, $startAt, $endAt, $_GET["select"]);
+            $response->getFilterData($tabla,$linkTo, $equalTo, $orderBy, $orderMode, $startAt, $endAt, $selected);
         } else if (isset($_GET['rel']) && isset($_GET['type']) && explode("?", $routesArray[1])[0] == "relations" && !isset($_GET['linkTo']) && !isset($_GET['equalTo'])) {
-            
             // peticion get con autorization administrative
             foreach(RouetesController::tableProtected() as $key => $value){
                 if(explode("?", $routesArray[1])[0] == $value){
                     if(isset($_GET["select"]) && $_GET["select"] == "*"){
-                        $json = array(
-                            'status' => 400,
-                            "result" => "you are no autorized for make this request"
-                        );
-                        echo json_encode($json, http_response_code($json["status"]));
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("userResponse");
                         return;
                     }
                 }
             }
 
             /* Get Petition of relation tables not filter */
-            if (isset($_GET["orderBy"]) && isset($_GET["orderMode"])) {
-                $orderBy = $_GET["orderBy"];
-                $orderMode = $_GET["orderMode"];
-            } else {
-                $orderBy = null;
-                $orderMode = null;
+            include_once "ordenable.php";
+            $rel = RouetesController::validacionCampos($_GET["rel"], "campo");
+            $type = RouetesController::validacionCampos($_GET["type"], "campo");
+            $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+           
+            if($rel == "invalidate" || $type == "invalidate" || $selected == "invalidate"){
+                $statusCode = new RouetesController();
+                $statusCode -> StatusResponse("badResponse");
+                return;
             }
-            /* GET star and ent at  */
-            if (isset($_GET["startAt"]) && isset($_GET["endAt"])) {
-                $startAt = $_GET["startAt"];
-                $endAt = $_GET["endAt"];
-            } else {
-                $startAt = null;
-                $endAt = null;
-            }
+       
             $response = new GetController();
-            $response->getRelData($_GET["rel"], $_GET["type"], $orderBy, $orderMode, $startAt, $endAt, $_GET["select"]);
+            $response->getRelData($rel, $type, $orderBy, $orderMode, $startAt, $endAt, $selected);
         } else if (isset($_GET['rel']) && isset($_GET['type']) && explode("?", $routesArray[1])[0] == "relations" && isset($_GET['linkTo']) && isset($_GET['equalTo'])) {
 
             // peticion get con autorization administrative
             foreach(RouetesController::tableProtected() as $key => $value){
                 if(explode("?", $routesArray[1])[0] == $value){
                     if(isset($_GET["select"]) && $_GET["select"] == "*"){
-                        $json = array(
-                            'status' => 400,
-                            "result" => "you are no autorized for make this request"
-                        );
-                        echo json_encode($json, http_response_code($json["status"]));
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("userResponse");
                         return;
                     }
                 }
@@ -140,25 +114,19 @@ if (count($routesArray) == 0) {
 
             /* Get Petition of relation tables with filter */
             /* GET Order Tables  */
-            if (isset($_GET["orderBy"]) && isset($_GET["orderMode"])) {
-
-                $orderBy = $_GET["orderBy"];
-                $orderMode = $_GET["orderMode"];
-            } else {
-
-                $orderBy = null;
-                $orderMode = null;
+            include_once "ordenable.php";
+            $rel = RouetesController::validacionCampos($_GET["rel"], "campo");
+            $type = RouetesController::validacionCampos($_GET["type"], "campo");
+            $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+            $linkTo =  RouetesController::validacionCampos( $_GET["linkTo"], "campo");
+            $equalTo = RouetesController::validacionCampos(  $_GET["equalTo"], "global");
+           
+            if($rel == "invalidate" || $type == "invalidate" || $selected == "invalidate"|| $linkTo == "invalidate" || $equalTo == "invalidate"){
+                $statusCode = new RouetesController();
+                $statusCode -> StatusResponse("badResponse");
+                return;
             }
-            /* GET star and ent at  */
-            if (isset($_GET["startAt"]) && isset($_GET["endAt"])) {
 
-                $startAt = $_GET["startAt"];
-                $endAt = $_GET["endAt"];
-            } else {
-
-                $startAt = null;
-                $endAt = null;
-            }
             $response = new GetController();
             $response->getRelFilterData($_GET["rel"], $_GET["type"], $_GET["linkTo"], $_GET["equalTo"], $orderBy, $orderMode, $startAt, $endAt, $_GET["select"]);
         } else if (isset($_GET['linkTo']) && isset($_GET['search'])) {
@@ -167,11 +135,8 @@ if (count($routesArray) == 0) {
             foreach(RouetesController::tableProtected() as $key => $value){
                 if(explode("?", $routesArray[1])[0] == $value){
                     if(isset($_GET["select"]) && $_GET["select"] == "*"){
-                        $json = array(
-                            'status' => 400,
-                            "result" => "you are no autorized for make this request"
-                        );
-                        echo json_encode($json, http_response_code($json["status"]));
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("userResponse");
                         return;
                     }
                 }
@@ -179,34 +144,37 @@ if (count($routesArray) == 0) {
             
             /* get petition for search */
             /* GET Order Tables  */
-            if (isset($_GET["orderBy"]) && isset($_GET["orderMode"])) {
-
-                $orderBy = $_GET["orderBy"];
-                $orderMode = $_GET["orderMode"];
-            } else {
-
-                $orderBy = null;
-                $orderMode = null;
-            }
-            /* GET star and ent at  */
-            if (isset($_GET["startAt"]) && isset($_GET["endAt"])) {
-
-                $startAt = $_GET["startAt"];
-                $endAt = $_GET["endAt"];
-            } else {
-
-                $startAt = null;
-                $endAt = null;
-            }
+            include_once "ordenable.php";
 
             if (explode("?", $routesArray[1])[0] == "relations" && isset($_GET["rel"]) && isset($_GET["type"])) {
+                $rel = RouetesController::validacionCampos($_GET["rel"], "campo");
+                $type = RouetesController::validacionCampos($_GET["type"], "campo");
+                $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+                $linkTo =  RouetesController::validacionCampos( $_GET["linkTo"], "campo");
+                $search = RouetesController::validacionCampos(  $_GET["search"], "global");
+               
+                if($rel == "invalidate" || $type == "invalidate" || $selected == "invalidate"|| $linkTo == "invalidate" || $search == "invalidate"){
+                    $statusCode = new RouetesController();
+                    $statusCode -> StatusResponse("badResponse");
+                    return;
+                }
 
                 $response = new GetController();
-                $response->getSearchRelData($_GET["rel"], $_GET["type"], $_GET["linkTo"], $_GET["search"], $orderBy, $orderMode, $startAt, $endAt, $_GET["select"]);
+                $response->getSearchRelData($rel, $type, $linkTo, $search, $orderBy, $orderMode, $startAt, $endAt, $selected);
             } else {
+                $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
+                $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+                $linkTo =  RouetesController::validacionCampos( $_GET["linkTo"], "campo");
+                $search = RouetesController::validacionCampos(  $_GET["search"], "global");
+               
+                if($tabla == "invalidate" || $selected == "invalidate"|| $linkTo == "invalidate" || $search == "invalidate"){
+                    $statusCode = new RouetesController();
+                    $statusCode -> StatusResponse("badResponse");
+                    return;
+                }
 
                 $response = new GetController();
-                $response->getSearchData(explode("?", $routesArray[1])[0], $_GET["linkTo"], $_GET["search"], $orderBy, $orderMode, $startAt, $endAt, $_GET["select"]);
+                $response->getSearchData($tabla, $linkTo, $search, $orderBy, $orderMode, $startAt, $endAt, $selected);
             }
         } else if (isset($_GET['linkTo']) && isset($_GET['between1']) && isset($_GET['between2']) && isset($_GET['filterTo']) && isset($_GET['inTo'])) {
 
@@ -214,11 +182,8 @@ if (count($routesArray) == 0) {
             foreach(RouetesController::tableProtected() as $key => $value){
                 if(explode("?", $routesArray[1])[0] == $value){
                     if(isset($_GET["select"]) && $_GET["select"] == "*"){
-                        $json = array(
-                            'status' => 400,
-                            "result" => "you are no autorized for make this request"
-                        );
-                        echo json_encode($json, http_response_code($json["status"]));
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("userResponse");
                         return;
                     }
                 }
@@ -226,25 +191,7 @@ if (count($routesArray) == 0) {
             
             /* get petition for between */
             /* GET Order Tables  */
-            if (isset($_GET["orderBy"]) && isset($_GET["orderMode"])) {
-
-                $orderBy = $_GET["orderBy"];
-                $orderMode = $_GET["orderMode"];
-            } else {
-
-                $orderBy = null;
-                $orderMode = null;
-            }
-            /* GET star and ent at  */
-            if (isset($_GET["startAt"]) && isset($_GET["endAt"])) {
-
-                $startAt = $_GET["startAt"];
-                $endAt = $_GET["endAt"];
-            } else {
-
-                $startAt = null;
-                $endAt = null;
-            }
+            include_once "ordenable.php";
 
             if (explode("?", $routesArray[1])[0] == "relations" && isset($_GET["rel"]) && isset($_GET["type"])) {
 
@@ -262,31 +209,29 @@ if (count($routesArray) == 0) {
                 if(explode("?", $routesArray[1])[0] == $value){
                     if(isset($_GET["rol"])){
                         $linkTo = "username_user";
-                        $equalTo = $_GET["rol"];
+                        $users = RouetesController::validacionCampos($_GET["rol"], "simple");
+
+                        if($users == "invalidate"){
+                            $statusCode = new RouetesController();
+                            $statusCode -> StatusResponse("userResponse");
+                            return;
+                        }
+                        $equalTo = $users;
                         $response = GetModel::getFilterData("users",$linkTo,$equalTo,null,null,null,null,"rol_user");
                         if(count($response) > 0){
                             if($response[0]->rol_user != "admin"){
-                                $json = array(
-                                    'status' => 400,
-                                    "result" => "you are no autorized for make this request"
-                                );
-                                echo json_encode($json, http_response_code($json["status"]));
+                                $statusCode = new RouetesController();
+                                $statusCode -> StatusResponse("userResponse");
                                 return;
                             }
                         }else{
-                            $json = array(
-                                'status' => 400,
-                                "result" => "you are no autorized for make this request"
-                            );
-                            echo json_encode($json, http_response_code($json["status"]));
+                            $statusCode = new RouetesController();
+                            $statusCode -> StatusResponse("userResponse");
                             return;
                         }
                     }else{
-                        $json = array(
-                            'status' => 400,
-                            "result" => "you are no autorized for make this request"
-                        );
-                        echo json_encode($json, http_response_code($json["status"]));
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("userResponse");
                         return;
                     }
                 }
@@ -294,39 +239,18 @@ if (count($routesArray) == 0) {
 
             /* GET Petition not filter */
             /* GET Order Tables  */
-            if (isset($_GET["orderBy"]) && isset($_GET["orderMode"])) {
-                $orderBy = $_GET["orderBy"];
-                $orderMode = $_GET["orderMode"];
-            } else {
-                $orderBy = null;
-                $orderMode = null;
-            }
-            /* GET star and ent at  */
-            if (isset($_GET["startAt"]) && isset($_GET["endAt"])) {
-                $startAt = $_GET["startAt"];
-                $endAt = $_GET["endAt"];
-            } else {
-                $startAt = null;
-                $endAt = null;
-            }
-            if(!isset($_GET["select"])){
-                $json = array(
-                    'status' => 400,
-                    'result' => "no found"
-                );
-                echo json_encode($json, http_response_code($json["status"]));
-                return;
-            }
+            include_once "ordenable.php";
             
-            $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
-            $selected = RouetesController::validacionCampos($_GET["select"], "select");
-           
-            if($tabla == "invalidate"){
+            if(!isset($_GET["select"])){
                 $statusCode = new RouetesController();
                 $statusCode -> StatusResponse("badResponse");
                 return;
             }
-            if($selected == "invalidate"){
+            
+            $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
+            $selected = RouetesController::validacionCampos($_GET["select"], "campo");
+           
+            if($tabla == "invalidate" || $selected == "invalidate"){
                 $statusCode = new RouetesController();
                 $statusCode -> StatusResponse("badResponse");
                 return;

@@ -6,3 +6,5 @@
 6.- se crean las coneccionex get, post, put, deleteData
     1.- comenzamos con la get sin filtro: 
         se crea en el archivo route.php y se complementa con -> controlador -> modelo 
+        si existe un error al conectar los nombres y son correctos en las bd, es posible que las resticciones no lo deje pasar, checar funcion validacionCampos
+        
