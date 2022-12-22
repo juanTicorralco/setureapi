@@ -575,7 +575,7 @@ if (count($routesArray) == 0) {
                         if ($user[0]->token_exp_user > $time) {
 
                             $response = new DeleteController();
-                            $response->deleteData(explode("?", $routesArray[1])[0], $_GET["id"], $_GET["nameId"]);
+                            $response->deleteData($table, $equalTo, $linkTo);
                         } else {
 
                             $statusCode = new RouetesController();
