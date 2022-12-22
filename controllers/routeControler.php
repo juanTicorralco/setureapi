@@ -9,7 +9,7 @@ class RouetesController{
     }
 
     static public function dbPrincipal(){
-        return "wesharp2";
+        return "seture";
     }
 
     static public function tableProtected(){
@@ -66,6 +66,13 @@ class RouetesController{
             $json = array(
                 'status' => 400,
                 "result" => "You need login"
+            );
+            echo json_encode($json, http_response_code($json["status"]));
+        }
+        if($code == "columsNoDB"){
+            $json = array(
+                'status' => 400,
+                'result' => "Error: Fields in the form do not match the database"
             );
             echo json_encode($json, http_response_code($json["status"]));
         }

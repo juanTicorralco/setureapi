@@ -7,4 +7,17 @@
     1.- comenzamos con la get sin filtro: 
         se crea en el archivo route.php y se complementa con -> controlador -> modelo 
         si existe un error al conectar los nombres y son correctos en las bd, es posible que las resticciones no lo deje pasar, checar funcion validacionCampos
-        
+        se hacen las demas peticiones get
+    2.- Hacer las peticiones post
+        - El login y register debe tener una palabra clabe en la variable get en desarrollo es true en produccion de debe cambiar
+        - en la funcion dbPrincipal se debe cambiar el nombre por la base de datos qiue se este utilizando en produccion se cambiar
+        - para el uso del login y demas procesos post se debe descargar composer 
+            ° Descargar y intalar composer
+            ° checar si tienes composer instalado con composer --version
+            ° irse a la direccion donde tienes instalado el proyecto en cmd y se ejecuta "composer require firebase/php-jwt"
+            ° si la base de datos no contiene algun campo que este en la lista del login, colocarlo
+        - si el token dice no se usa para desarrollo, cambiar el no en produccion
+    3.- crear las peticiones put
+        - si el token dice no se usa para desarrollo, cambiar el no en produccion
+    4.-Crear las peticiones delete
+        -

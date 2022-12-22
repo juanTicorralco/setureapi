@@ -287,330 +287,325 @@ if (count($routesArray) == 0) {
             $response->getData($tabla, $orderBy, $orderMode, $startAt, $endAt, $selected);
         }
     }
-    // /* petition POST */
-    // if (count($routesArray) == 1 && isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
+    /* petition POST */
+    if (count($routesArray) == 1 && isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
 
-    //     /* BRING the list of the columns of the table to change */
-    //     $columns = array();
-    //     $dbPrincipal = RouetesController::dbPrincipal();
-    //     $response = PostController::getColumnsData(explode("?", $routesArray[1])[0], $dbPrincipal);
+        /* BRING the list of the columns of the table to change */
+        $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
+       
+        if($tabla == "invalidate"){
+            $statusCode = new RouetesController();
+            $statusCode -> StatusResponse("badResponse");
+            return;
+        }
 
-    //     foreach ($response as $key => $value) {
-    //         array_push($columns, $value->item);
-    //     }
-    //     array_shift($columns);
-    //     array_pop($columns);
+        $columns = array();
+        $dbPrincipal = RouetesController::dbPrincipal();
+        $response = PostController::getColumnsData(explode("?", $routesArray[1])[0], $dbPrincipal);
 
-    //     if (isset($_POST)) {
-    //         /* validate that the variables in the PUT fields match the column names in the database */
-    //         $count = 0;
-    //         foreach (array_keys($_POST) as $key => $value) {
-    //             $count = array_search($value, $columns);
-    //         }
+        foreach ($response as $key => $value) {
+            array_push($columns, $value->item);
+        }
+        array_shift($columns);
+        array_pop($columns);
 
-    //         if ($count > 0) {
+        if (isset($_POST)) {
+            /* validate that the variables in the PUT fields match the column names in the database */
+            $count = 0;
+            foreach (array_keys($_POST) as $key => $value) {
+                $count = array_search($value, $columns);
+            }
 
-    //             /* we give to response of controller for user register */
-    //             if (isset($_GET["register"]) && $_GET["register"] == true) {
+            if ($count > 0) {
 
-    //                 /* we give response of the controller for insert data in a table */
-    //                 $response = new PostController();
-    //                 $response->postRegister(explode("?", $routesArray[1])[0], $_POST);
-    //             } else if (isset($_GET["login"]) && $_GET["login"] == true) {
+                /* we give to response of controller for user register */
+                if (isset($_GET["register"]) && $_GET["register"] == "true") {
 
-    //                 /* we give response of the controller for insert data in a table */
-    //                 $response = new PostController();
-    //                 $response->postLogin(explode("?", $routesArray[1])[0], $_POST);
-    //             } else if (isset($_GET["token"])) {
+                    /* we give response of the controller for insert data in a table */
+                    $response = new PostController();
+                    $response->postRegister(explode("?", $routesArray[1])[0], $_POST);
+                } else if (isset($_GET["login"]) && $_GET["login"] == "true") {
 
-    //                 /* Agregamos ecepcion para actualizar sin autorizacion */
-    //                 if ($_GET["token"] == "no") {
-    //                     if (isset($_GET["except"])) {
-    //                         $num = 0;
-    //                         foreach ($columns as $key => $value) {
-    //                             $num++;
-    //                             /* buscamos coincidencias con la ecepcion */
-    //                             if ($value == $_GET["except"]) {
-    //                                 /* we give response of the controller for insert data in a table */
-    //                                 $response = new PostController();
-    //                                 $response->postData(explode("?", $routesArray[1])[0], $_POST);
-    //                                 return;
-    //                             }
-    //                         }
-    //                         /* cuando no se encuentra coincidencia */
-    //                         if ($num == count($columns)) {
-    //                             $json = array(
-    //                                 'status' => 400,
-    //                                 'result' => "Error: the exception does not match the database"
-    //                             );
-    //                             echo json_encode($json, http_response_code($json["status"]));
-    //                             return;
-    //                         }
-    //                     } else {
-    //                         /* cuando no se envia una excepcion */
-    //                         if ($num == count($columns)) {
-    //                             $json = array(
-    //                                 'status' => 400,
-    //                                 'result' => "Error: there is no exception"
-    //                             );
-    //                             echo json_encode($json, http_response_code($json["status"]));
-    //                             return;
-    //                         }
-    //                     }
-    //                 } else {
+                    /* we give response of the controller for insert data in a table */
+                    $response = new PostController();
+                    $response->postLogin(explode("?", $routesArray[1])[0], $_POST);
+                } else if (isset($_GET["token"])) {
+
+                    /* Agregamos ecepcion para actualizar sin autorizacion */
+                    if ($_GET["token"] == "no") {
+                        if (isset($_GET["except"])) {
+                            $num = 0;
+                            foreach ($columns as $key => $value) {
+                                $num++;
+                                /* buscamos coincidencias con la ecepcion */
+                                if ($value == $_GET["except"]) {
+                                    /* we give response of the controller for insert data in a table */
+                                    $response = new PostController();
+                                    $response->postData(explode("?", $routesArray[1])[0], $_POST);
+                                    return;
+                                }
+                            }
+                            /* cuando no se encuentra coincidencia */
+                            if ($num == count($columns)) {
+                                $json = array(
+                                    'status' => 400,
+                                    'result' => "Error: the exception does not match the database"
+                                );
+                                echo json_encode($json, http_response_code($json["status"]));
+                                return;
+                            }
+                        } else {
+                            /* cuando no se envia una excepcion */
+                            $json = array(
+                                'status' => 400,
+                                'result' => "Error: there is no exception"
+                            );
+                            echo json_encode($json, http_response_code($json["status"]));
+                            return;
+                        }
+                    } else {
 
 
-    //                     /* we bring the user according to the tok */
-    //                     $user = GetModel::getFilterData("users", "token_user", $_GET["token"], null, null, null, null, "token_exp_user");
+                        /* we bring the user according to the tok */
+                        $user = GetModel::getFilterData("users", "token_user", $_GET["token"], null, null, null, null, "token_exp_user");
 
-    //                     if (!empty($user)) {
-    //                         /* validate that the token has not expired */
-    //                         $time = time();
-    //                         if ($user[0]->token_exp_user > $time) {
+                        if (!empty($user)) {
+                            /* validate that the token has not expired */
+                            $time = time();
+                            if ($user[0]->token_exp_user > $time) {
 
-    //                             /* we give response of the controller for insert data in a table */
-    //                             $response = new PostController();
-    //                             $response->postData(explode("?", $routesArray[1])[0], $_POST);
-    //                         } else {
+                                /* we give response of the controller for insert data in a table */
+                                $response = new PostController();
+                                $response->postData(explode("?", $routesArray[1])[0], $_POST);
+                            } else {
 
-    //                             $json = array(
-    //                                 'status' => 303,
-    //                                 'result' => "Error: the token has expired"
-    //                             );
-    //                             echo json_encode($json, http_response_code($json["status"]));
-    //                             return;
-    //                         }
-    //                     } else {
+                                $statusCode = new RouetesController();
+                                $statusCode -> StatusResponse("tokenExpire");
+                                return;
+                            }
+                        } else {
 
-    //                         $json = array(
-    //                             'status' => 400,
-    //                             'result' => "Error: The user is not authorized"
-    //                         );
-    //                         echo json_encode($json, http_response_code($json["status"]));
-    //                         return;
-    //                     }
-    //                 }
-    //             } else {
+                            $statusCode = new RouetesController();
+                            $statusCode -> StatusResponse("tokenNoAutorize");
+                            return;
+                        }
+                    }
+                } else {
 
-    //                 $json = array(
-    //                     'status' => 400,
-    //                     'result' => "Error: Authorization required"
-    //                 );
-    //                 echo json_encode($json, http_response_code($json["status"]));
-    //                 return;
-    //             }
-    //         } else {
-    //             $json = array(
-    //                 'status' => 400,
-    //                 'result' => "Error: Fields in the form do not match the database"
-    //             );
-    //             echo json_encode($json, http_response_code($json["status"]));
-    //             return;
-    //         }
-    //     }
-    // }
-    // /* petition PUT */
-    // if (count($routesArray) == 1 && isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "PUT") {
+                    $json = array(
+                        'status' => 400,
+                        'result' => "Error: Authorization required"
+                    );
+                    echo json_encode($json, http_response_code($json["status"]));
+                    return;
+                }
+            } else {
+                $json = array(
+                    'status' => 400,
+                    'result' => "Error: Fields in the form do not match the database"
+                );
+                echo json_encode($json, http_response_code($json["status"]));
+                return;
+            }
+        }
+    }
+    /* petition PUT */
+    if (count($routesArray) == 1 && isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "PUT") {
 
-    //     /* we ask about the id */
-    //     if (isset($_GET["id"]) && isset($_GET["nameId"])) {
-    //         /* Validated to exist id */
-    //         $table = explode("?", $routesArray[1])[0];
-    //         $linkTo = $_GET["nameId"];
-    //         $equalTo = $_GET["id"];
-    //         $orderBy = null;
-    //         $orderMode = null;
-    //         $startAt = null;
-    //         $endAt = null;
-    //         $select = $_GET["nameId"];
+        /* we ask about the id */
+        if (isset($_GET["id"]) && isset($_GET["nameId"])) {
 
-    //         $response = PutController::getFilterData($table, $linkTo, $equalTo, $orderBy, $orderMode, $startAt, $endAt, $select);
+            $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
+            $selected = RouetesController::validacionCampos($_GET["nameId"], "campo");
+            $linkT =  RouetesController::validacionCampos( $_GET["nameId"], "campo");
+            $equalT = RouetesController::validacionCampos(  $_GET["id"], "numero");
+           
+            if($tabla == "invalidate" || $selected == "invalidate" || $linkT == "invalidate" || $equalT == "invalidate"){
+                $statusCode = new RouetesController();
+                $statusCode -> StatusResponse("badResponse");
+                return;
+            }
+            /* Validated to exist id */
+            $table = $tabla;
+            $linkTo = $linkT;
+            $equalTo = $equalT;
+            $orderBy = null;
+            $orderMode = null;
+            $startAt = null;
+            $endAt = null;
+            $select = $selected;
 
-    //         if ($response) {
-    //             $data = array();
-    //             parse_str(file_get_contents('php://input'), $data);
+            $response = PutController::getFilterData($table, $linkTo, $equalTo, $orderBy, $orderMode, $startAt, $endAt, $select);
+            
+            if ($response && is_array($response)) {
+                $data = array();
+                parse_str(file_get_contents('php://input'), $data);
 
-    //             /* BRING the list of the columns of the table to change */
-    //             $columns = array();
-    //             $dbPrincipal = RouetesController::dbPrincipal();
-    //             $response = PostController::getColumnsData(explode("?", $routesArray[1])[0], $dbPrincipal);
+                /* BRING the list of the columns of the table to change */
+                $columns = array();
+                $dbPrincipal = RouetesController::dbPrincipal();
+                $response = PostController::getColumnsData(explode("?", $routesArray[1])[0], $dbPrincipal);
 
-    //             foreach ($response as $key => $value) {
-    //                 array_push($columns, $value->item);
-    //             }
-    //             /* we remove the first and last index */
-    //             array_shift($columns);
-    //             array_pop($columns);
-    //             array_pop($columns);
+                foreach ($response as $key => $value) {
+                    array_push($columns, $value->item);
+                }
+                /* we remove the first and last index */
+                array_shift($columns);
+                array_pop($columns);
+                array_pop($columns);
 
-    //             /* validate that the variables in the PUT fields match the column names in the database */
-    //             $count = 0;
-    //             foreach (array_keys($data) as $key => $value) {
-    //                 $count = array_search($value, $columns);
-    //             }
-    //             if ($count > 0) {
+                /* validate that the variables in the PUT fields match the column names in the database */
+                $count = 0;
+                foreach (array_keys($data) as $key => $value) {
+                    $count = array_search($value, $columns)+1;
+                }
+                
+                if ($count > 0) {
 
-    //                 if (isset($_GET["token"])) {
-    //                     /* Agregamos ecepcion para actualizar sin autorizacion */
-    //                     if ($_GET["token"] == "no") {
-    //                         if (isset($_GET["except"])) {
-    //                             $num = 0;
-    //                             foreach ($columns as $key => $value) {
-    //                                 $num++;
-    //                                 /* buscamos coincidencias con la ecepcion */
-    //                                 if ($value == $_GET["except"]) {
-    //                                     /* We request controller response to edit any table */
-    //                                     $response = new PutController();
-    //                                     $response->putData(explode("?", $routesArray[1])[0], $data, $_GET["id"], $_GET["nameId"]);
-    //                                     return;
-    //                                 }
-    //                             }
-    //                             /* cuando no se encuentra coincidencia */
-    //                             if ($num == count($columns)) {
-    //                                 $json = array(
-    //                                     'status' => 400,
-    //                                     'result' => "Error: the exception does not match the database"
-    //                                 );
-    //                                 echo json_encode($json, http_response_code($json["status"]));
-    //                                 return;
-    //                             }
-    //                         } else {
-    //                             /* cuando no se envia una excepcion */
-    //                             if ($num == count($columns)) {
-    //                                 $json = array(
-    //                                     'status' => 400,
-    //                                     'result' => "Error: there is no exception"
-    //                                 );
-    //                                 echo json_encode($json, http_response_code($json["status"]));
-    //                                 return;
-    //                             }
-    //                         }
-    //                     } else {
+                    if (isset($_GET["token"])) {
+                        /* Agregamos ecepcion para actualizar sin autorizacion */
+                        if ($_GET["token"] == "no") {
+                            if (isset($_GET["except"])) {
+                                $num = 0;
+                                foreach ($columns as $key => $value) {
+                                    $num++;
+                                    /* buscamos coincidencias con la ecepcion */
+                                    if ($value == $_GET["except"]) {
+                                        /* We request controller response to edit any table */
+                                        $response = new PutController();
+                                        $response->putData(explode("?", $routesArray[1])[0], $data, $_GET["id"], $_GET["nameId"]);
+                                        return;
+                                    }
+                                }
+                                /* cuando no se encuentra coincidencia */
+                                if ($num == count($columns)) {
+                                    $statusCode = new RouetesController();
+                                    $statusCode -> StatusResponse("badResponse");
+                                    return;
+                                }
+                            } else {
+                                /* cuando no se envia una excepcion */
+                                    $statusCode = new RouetesController();
+                                    $statusCode -> StatusResponse("badResponse");
+                                    return;
+                            }
+                        } else {
 
-    //                         /* we bring the user according to the tok */
-    //                         $user = GetModel::getFilterData("users", "token_user", $_GET["token"], null, null, null, null, "token_exp_user");
+                            /* we bring the user according to the tok */
+                            $user = GetModel::getFilterData("users", "token_user", $_GET["token"], null, null, null, null, "token_exp_user");
 
-    //                         if (!empty($user)) {
+                            if (!empty($user)) {
 
-    //                             /* validate that the token has not expired */
-    //                             $time = time();
-    //                             if ($user[0]->token_exp_user > $time) {
+                                /* validate that the token has not expired */
+                                $time = time();
+                                if ($user[0]->token_exp_user > $time) {
 
-    //                                 /* We request controller response to edit any table */
-    //                                 $response = new PutController();
-    //                                 $response->putData(explode("?", $routesArray[1])[0], $data, $_GET["id"], $_GET["nameId"]);
-    //                             } else {
+                                    /* We request controller response to edit any table */
+                                    $response = new PutController();
+                                    $response->putData(explode("?", $routesArray[1])[0], $data, $_GET["id"], $_GET["nameId"]);
+                                } else {
 
-    //                                 $json = array(
-    //                                     'status' => 303,
-    //                                     'result' => "Error: the token has expired"
-    //                                 );
-    //                                 echo json_encode($json, http_response_code($json["status"]));
-    //                                 return;
-    //                             }
-    //                         } else {
+                                    $statusCode = new RouetesController();
+                                    $statusCode -> StatusResponse("tokenExpire");
+                                    return;
+                                }
+                            } else {
 
-    //                             $json = array(
-    //                                 'status' => 400,
-    //                                 'result' => "Error: The user is not authorized"
-    //                             );
-    //                             echo json_encode($json, http_response_code($json["status"]));
-    //                             return;
-    //                         }
-    //                     }
-    //                 } else {
+                                $statusCode = new RouetesController();
+                                $statusCode -> StatusResponse("tokenNoAutorize");
+                                return;
+                            }
+                        }
+                    } else {
 
-    //                     $json = array(
-    //                         'status' => 400,
-    //                         'result' => "Error: Authorization required"
-    //                     );
-    //                     echo json_encode($json, http_response_code($json["status"]));
-    //                     return;
-    //                 }
-    //             } else {
-    //                 $json = array(
-    //                     'status' => 400,
-    //                     'result' => "Error: Fields in the form do not match the database"
-    //                 );
-    //                 echo json_encode($json, http_response_code($json["status"]));
-    //                 return;
-    //             }
-    //         } else {
-    //             $json = array(
-    //                 'status' => 400,
-    //                 'result' => "Error: The id is not found in the database"
-    //             );
-    //             echo json_encode($json, http_response_code($json["status"]));
-    //             return;
-    //         }
-    //     }
-    // }
-    // /* petition DELETE */
-    // if (count($routesArray) == 1 && isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "DELETE") {
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("tokenNoAutorize");
+                        return;
+                    }
+                } else {
+                    $statusCode = new RouetesController();
+                    $statusCode -> StatusResponse("columsNoDB");
+                    return;
+                }
+            } else {
+                $statusCode = new RouetesController();
+                $statusCode -> StatusResponse("columsNoDB");
+                return;
+            }
+        }
+    }
+    /* petition DELETE */
+    if (count($routesArray) == 1 && isset($_SERVER["REQUEST_METHOD"]) && $_SERVER["REQUEST_METHOD"] == "DELETE") {
 
-    //     /* we ask about the id */
-    //     if (isset($_GET["id"]) && isset($_GET["nameId"])) {
-    //         /* Validated to exist id */
-    //         $table = explode("?", $routesArray[1])[0];
-    //         $linkTo = $_GET["nameId"];
-    //         $equalTo = $_GET["id"];
-    //         $orderBy = null;
-    //         $orderMode = null;
-    //         $startAt = null;
-    //         $endAt = null;
-    //         $select = $_GET["nameId"];
+        /* we ask about the id */
+        if (isset($_GET["id"]) && isset($_GET["nameId"])) {
+            $tabla = RouetesController::validacionCampos(explode("?", $routesArray[1])[0], "tabla");
+            $selected = RouetesController::validacionCampos($_GET["nameId"], "campo");
+            $linkT =  RouetesController::validacionCampos( $_GET["nameId"], "campo");
+            $equalT = RouetesController::validacionCampos(  $_GET["id"], "numero");
+           
+            if($tabla == "invalidate" || $selected == "invalidate" || $linkT == "invalidate" || $equalT == "invalidate"){
+                $statusCode = new RouetesController();
+                $statusCode -> StatusResponse("badResponse");
+                return;
+            }
+            /* Validated to exist id */
 
-    //         $response = PutController::getFilterData($table, $linkTo, $equalTo, $orderBy, $orderMode, $startAt, $endAt, $select);
+            $table = $tabla;
+            $linkTo = $linkT;
+            $equalTo = $equalT;
+            $orderBy = null;
+            $orderMode = null;
+            $startAt = null;
+            $endAt = null;
+            $select = $selected;
 
-    //         if ($response) {
+            $response = PutController::getFilterData($table, $linkTo, $equalTo, $orderBy, $orderMode, $startAt, $endAt, $select);
 
-    //             if (isset($_GET["token"])) {
-    //                 /* we bring the user according to the tok */
-    //                 $user = GetModel::getFilterData("users", "token_user", $_GET["token"], null, null, null, null, "token_exp_user");
+            if ($response && is_array($response)) {
 
-    //                 if (!empty($user)) {
+                if (isset($_GET["token"])) {
+                    /* we bring the user according to the tok */
+                    $user = GetModel::getFilterData("users", "token_user", $_GET["token"], null, null, null, null, "token_exp_user");
+                    
+                    if (!empty($user) && is_array($user)) {
 
-    //                     /* validate that the token has not expired */
-    //                     $time = time();
-    //                     if ($user[0]->token_exp_user > $time) {
+                        /* validate that the token has not expired */
+                        $time = time();
+                        if ($user[0]->token_exp_user > $time) {
 
-    //                         $response = new DeleteController();
-    //                         $response->deleteData(explode("?", $routesArray[1])[0], $_GET["id"], $_GET["nameId"]);
-    //                     } else {
+                            $response = new DeleteController();
+                            $response->deleteData(explode("?", $routesArray[1])[0], $_GET["id"], $_GET["nameId"]);
+                        } else {
 
-    //                         $json = array(
-    //                             'status' => 303,
-    //                             'result' => "Error: the token has expired"
-    //                         );
-    //                         echo json_encode($json, http_response_code($json["status"]));
-    //                         return;
-    //                     }
-    //                 } else {
+                            $statusCode = new RouetesController();
+                            $statusCode -> StatusResponse("tokenExpire");
+                            return;
+                        }
+                    } else {
 
-    //                     $json = array(
-    //                         'status' => 400,
-    //                         'result' => "Error: The user is not authorized"
-    //                     );
-    //                     echo json_encode($json, http_response_code($json["status"]));
-    //                     return;
-    //                 }
-    //             } else {
+                        $statusCode = new RouetesController();
+                        $statusCode -> StatusResponse("tokenNoAutorize");
+                        return;
+                    }
+                } else {
 
-    //                 $json = array(
-    //                     'status' => 400,
-    //                     'result' => "Error: Authorization required"
-    //                 );
-    //                 echo json_encode($json, http_response_code($json["status"]));
-    //                 return;
-    //             }
-    //         } else {
-    //             $json = array(
-    //                 'status' => 400,
-    //                 'result' => "Error: The id is not found in the database"
-    //             );
-    //             echo json_encode($json, http_response_code($json["status"]));
-    //             return;
-    //         }
-    //     }
-    // }
+                    $statusCode = new RouetesController();
+                    $statusCode -> StatusResponse("tokenNoAutorize");
+                    return;
+                }
+            } else {
+                $json = array(
+                    'status' => 400,
+                    'result' => "Error: The id is not found in the database"
+                );
+                echo json_encode($json, http_response_code($json["status"]));
+                return;
+            }
+        }else{
+            $statusCode = new RouetesController();
+            $statusCode -> StatusResponse("badResponse");
+            return;
+        }
+    }
 }
