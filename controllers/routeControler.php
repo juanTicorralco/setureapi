@@ -22,7 +22,7 @@ class RouetesController{
             return $cmpo;
         }else if(preg_match('/^[A-Za-z0-9_,*]{1,}$/', $cmpo) && $tipo == "campo"){
             return $cmpo;
-        }else if(preg_match('/^[-\\(\\)\\=\\%\\&\\$\\;\\_\\*\\"\\#\\?\\¿\\!\\¡\\:\\.\\,\\0-9a-zA-ZñÑáéíóúÁÉÍÓÚ ]{1,}$/', $cmpo) && $tipo == "global"){
+        }else if(preg_match('/^[-\\(\\)\\=\\%\\&\\$\\;\\_\\*\\"\\#\\?\\¿\\!\\¡\\:\\.\\,\\@\\0-9a-zA-ZñÑáéíóúÁÉÍÓÚ ]{1,}$/', $cmpo) && $tipo == "global"){
             return $cmpo;
         }else if(preg_match('/^[A-Za-z]{1,}$/', $cmpo) && $tipo == "simple"){
             return $cmpo;
