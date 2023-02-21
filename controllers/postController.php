@@ -105,6 +105,27 @@ class PostController{
         }
     }
 
+     /* POST petition for newslater */ 
+     public function postNewslater($table, $data){
+        if(isset($data["email_newsletter"]) && $data["email_newsletter"] != null){
+            $response= PostModel :: postData($table, $data);
+            if(is_array($response)){
+                $json = array (
+                    "status" => 200,
+                    "result" => $response
+                );
+
+            }else{
+                $json = array (
+                    "status" => 404,
+                    "result" => "no found",
+                );
+            }
+            echo json_encode($json, http_response_code($json["status"]));
+            return;
+        }
+    }
+
     /* response of de data */
     public function responseData($response, $metodh, $error){
         if(!empty($response)){

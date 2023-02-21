@@ -23,6 +23,6 @@
 
 cambiar en produccion
 -Hacer la conexion a la base de datos cambiar en produccion
--El login y register debe tener una palabra clabe en la variable get en desarrollo es true en produccion de debe cambiar
+-El login y register y newslater debe tener una palabra clabe en la variable get en desarrollo es true en produccion de debe cambiar
 -En la funcion dbPrincipal se debe cambiar el nombre por la base de datos qiue se este utilizando en produccion se cambiar
 - si el token dice no se usa para desarrollo, cambiar el no en produccion

@@ -315,7 +315,7 @@ if (count($routesArray) == 0) {
             foreach (array_keys($_POST) as $key => $value) {
                 $count = array_search($value, $columns);
             }
-
+            
             if ($count > 0) {
 
                 /* we give to response of controller for user register */
@@ -329,6 +329,11 @@ if (count($routesArray) == 0) {
                     /* we give response of the controller for insert data in a table */
                     $response = new PostController();
                     $response->postLogin(explode("?", $routesArray[1])[0], $_POST);
+                }else if (isset($_GET["newslater"]) && $_GET["newslater"] == "true") {
+
+                    /* we give response of the controller for insert data in a table */
+                    $response = new PostController();
+                    $response->postNewslater(explode("?", $routesArray[1])[0], $_POST);
                 } else if (isset($_GET["token"])) {
 
                     /* Agregamos ecepcion para actualizar sin autorizacion */
