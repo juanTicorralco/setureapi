@@ -14,3 +14,13 @@ crear el dominio virtual
 2.- ir a C:\Windows\System32\drivers\etc\hosts y agregar el nuevo doninio virtual
 
 3.- Reiniciar el xampp
+
+--linea de codigo para modificar un campo de base de datos a timestamp automatico
+ALTER TABLE orders MODIFY date_update_order TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+Tipos de usuario
+1.- globalAdminister - Usuario con todos los permisos, puede ver y hacer todo
+2.- Administer - Solo puede ver cosas importantes de la empresa mas no del el negocio
+3.- delivery - Repartidor
+4.- vendor - Vendedor
+5.- 
